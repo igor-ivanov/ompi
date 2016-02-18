@@ -75,14 +75,6 @@ OPAL_DECLSPEC int opal_memory_linux_free_ptmalloc2_munmap(void *start, size_t le
 OPAL_DECLSPEC int munmap(void* addr, size_t len);
 #endif /* !MEMORY_LINUX_PTMALLOC2 */
 
-#if MEMORY_LINUX_HAVE_MALLOC_HOOK_SUPPORT
-OPAL_DECLSPEC void opal_memory_linux_malloc_init_hook(void);
-#endif /* MEMORY_LINUX_HAVE_MALLOC_HOOK_SUPPORT */
-
-#if MEMORY_LINUX_MALLOC_ALIGN_ENABLED
-OPAL_DECLSPEC void opal_memory_linux_malloc_set_alignment(int use_memalign, size_t memalign_threshold);
-#endif /* MEMORY_LINUX_MALLOC_ALIGN_ENABLED */
-
 END_C_DECLS
 
 #endif

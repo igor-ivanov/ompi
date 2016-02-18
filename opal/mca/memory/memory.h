@@ -110,6 +110,15 @@ typedef int (*opal_memory_base_component_deregister_fn_t)(void *base,
                                                           size_t len,
                                                           uint64_t cookie);
 
+/**
+ *  This function change default behaivour of malloc() to return
+ *  aligned allocated buffer.
+ *
+ * If a component does not want/need to provide this functionality, it
+ * can use an empty implementation of this function.
+ */
+typedef void (*opal_memory_base_component_malloc_set_alignment_fn_t)(int use_memalign,
+                                                                     size_t memalign_threshold);
 
 /**
  * Structure for memory components.
@@ -132,6 +141,8 @@ typedef struct opal_memory_base_component_2_0_0_t {
     /** Function invoked when Open MPI stops "caring" about a
         specific memory region */
     opal_memory_base_component_deregister_fn_t memoryc_deregister;
+
+    opal_memory_base_component_malloc_set_alignment_fn_t memoryc_malloc_set_alignment;
 } opal_memory_base_component_2_0_0_t;
 
 OPAL_DECLSPEC extern opal_memory_base_component_2_0_0_t *opal_memory;

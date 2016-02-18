@@ -42,21 +42,6 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stddef.h>
-#if MEMORY_LINUX_MALLOC_ALIGN_ENABLED
-/*
- * The include of malloc.h below breaks abstractions in OMPI (by
- * directly including a header file from another component), but has
- * been ruled "ok" because the openib component is only supported on
- * Linux.
- *
- * The malloc hooks in newer glibc were deprecated, including stock
- * malloc.h causes compilation warnings.  Instead, we use the internal
- * linux component malloc.h which does not cause these warnings.
- * Internally, OMPI uses the built-in ptmalloc from the linux memory
- * component anyway.
- */
-#include "opal/mca/memory/linux/memory_linux.h"
-#endif
 
 #include "opal/mca/event/event.h"
 #include "opal/align.h"
@@ -67,6 +52,7 @@
 #include "opal/util/sys_limits.h"
 #include "opal/util/argv.h"
 #include "opal/memoryhooks/memory.h"
+#include "opal/mca/memory/memory.h"
 /* Define this before including hwloc.h so that we also get the hwloc
    verbs helper header file, too.  We have to do this level of
    indirection because the hwloc subsystem is a component -- we don't
@@ -2512,14 +2498,14 @@ btl_openib_component_init(int *num_btl_modules,
     *num_btl_modules = 0;
     num_devs = 0;
 
-#if MEMORY_LINUX_MALLOC_ALIGN_ENABLED
     /* If we got this far, then setup the memory alloc hook (because
        we're most likely going to be using this component). The hook
        is to be set up as early as possible in this function since we
        want most of the allocated resources be aligned.
      */
-    opal_memory_linux_malloc_set_alignment(32, mca_btl_openib_module.super.btl_eager_limit);
-#endif /* MEMORY_LINUX_MALLOC_ALIGN_ENABLED */
+    if (opal_memory->memoryc_malloc_set_alignment) {
+        opal_memory->memoryc_malloc_set_alignment(32, mca_btl_openib_module.super.btl_eager_limit);
+    }
 
     /* Per https://svn.open-mpi.org/trac/ompi/ticket/1305, check to
        see if $sysfsdir/class/infiniband exists.  If it does not,

@@ -32,5 +32,9 @@ BEGIN_C_DECLS
  */
 OPAL_DECLSPEC extern mca_base_framework_t opal_memory_base_framework;
 
+#if MEMORY_HAVE_MALLOC_HOOK_SUPPORT
+OPAL_DECLSPEC void opal_memory_base_malloc_init_hook(void);
+#endif /* MEMORY_HAVE_MALLOC_HOOK_SUPPORT */
+
 END_C_DECLS
 #endif /* OPAL_BASE_MEMORY_H */

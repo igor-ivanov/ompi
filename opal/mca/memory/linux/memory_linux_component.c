@@ -66,6 +66,26 @@ static bool ummunotify_opened = false;
 static bool ptmalloc2_opened = false;
 #endif
 
+#if MEMORY_LINUX_MALLOC_ALIGN_ENABLED
+static void opal_memory_linux_malloc_set_alignment(int use_memalign, size_t memalign_threshold);
+
+static void *(*prev_malloc_hook)(size_t, const void *);
+
+/* This is a memory allocator hook. The purpose of this is to make
+ * every malloc aligned.
+ * There two basic cases here:
+ *
+ * 1. Memory manager for Open MPI is enabled. Then memalign below will
+ * be overridden by __memalign_hook which is set to
+ * opal_memory_linux_memalign_hook.  Thus, _malloc_hook is going to
+ * use opal_memory_linux_memalign_hook.
+ *
+ * 2. No memory manager support. The memalign below is just regular glibc
+ * memalign which will be called through __malloc_hook instead of malloc.
+ */
+static void *_opal_memory_linux_malloc_align_hook(size_t sz, const void* caller);
+#endif /* MEMORY_LINUX_MALLOC_ALIGN_ENABLED */
+
 bool opal_memory_linux_disable = false;
 
 opal_memory_linux_component_t mca_memory_linux_component = {
@@ -96,6 +116,9 @@ opal_memory_linux_component_t mca_memory_linux_component = {
            end up using ummunotify support. */
         .memoryc_register = opal_memory_base_component_register_empty,
         .memoryc_deregister = opal_memory_base_component_deregister_empty,
+#if MEMORY_LINUX_MALLOC_ALIGN_ENABLED
+        .memoryc_malloc_set_alignment = opal_memory_linux_malloc_set_alignment,
+#endif /* MEMORY_LINUX_MALLOC_ALIGN_ENABLED */
     },
 
     /* Component-specific data, filled in later (compiler will 0/NULL
@@ -104,25 +127,6 @@ opal_memory_linux_component_t mca_memory_linux_component = {
 
 static bool ptmalloc2_available = MEMORY_LINUX_PTMALLOC2;
 static bool ummunotify_available = MEMORY_LINUX_UMMUNOTIFY;
-
-#if MEMORY_LINUX_MALLOC_ALIGN_ENABLED
-
-static void *(*prev_malloc_hook)(size_t, const void *);
-
-/* This is a memory allocator hook. The purpose of this is to make
- * every malloc aligned.
- * There two basic cases here:
- *
- * 1. Memory manager for Open MPI is enabled. Then memalign below will
- * be overridden by __memalign_hook which is set to
- * opal_memory_linux_memalign_hook.  Thus, _malloc_hook is going to
- * use opal_memory_linux_memalign_hook.
- *
- * 2. No memory manager support. The memalign below is just regular glibc
- * memalign which will be called through __malloc_hook instead of malloc.
- */
-static void *_opal_memory_linux_malloc_align_hook(size_t sz, const void* caller);
-#endif /* MEMORY_LINUX_MALLOC_ALIGN_ENABLED */
 
 
 /*
@@ -347,7 +351,7 @@ static int linux_close(void)
 }
 
 #if MEMORY_LINUX_MALLOC_ALIGN_ENABLED
-void opal_memory_linux_malloc_set_alignment(int use_memalign, size_t memalign_threshold)
+static void opal_memory_linux_malloc_set_alignment(int use_memalign, size_t memalign_threshold)
 {
     /* ignore cases when this capability is enabled explicitly using
      * mca variables

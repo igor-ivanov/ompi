@@ -79,7 +79,7 @@ AC_DEFUN([MCA_opal_memory_linux_CONFIG],[
     AS_IF([test "$memory_hook_found" = "0"],
           [AC_MSG_RESULT([no])],
           [AC_MSG_RESULT([yes])])
-    AC_DEFINE_UNQUOTED([MEMORY_LINUX_HAVE_MALLOC_HOOK_SUPPORT], [$memory_hook_found],
+    AC_DEFINE_UNQUOTED([MEMORY_HAVE_MALLOC_HOOK_SUPPORT], [$memory_hook_found],
                    	   [Whether the system has Memory Allocation Hooks])
 
     AC_ARG_ENABLE(memory-linux-malloc-alignment,

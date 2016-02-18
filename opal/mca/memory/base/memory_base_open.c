@@ -41,6 +41,10 @@ static int empty_process(void)
     return OPAL_SUCCESS;
 }
 
+static void empty_malloc_set_alignment(int use_memalign,
+                                       size_t memalign_threshold)
+{
+}
 
 /*
  * Local variables
@@ -50,10 +54,11 @@ static opal_memory_base_component_2_0_0_t empty_component = {
     { 0, },
     /* Don't care about the data */
     { 0, },
-    /* Empty / safe functions to call if no memory componet is selected */
+    /* Empty / safe functions to call if no memory component is selected */
     empty_process,
     opal_memory_base_component_register_empty,
     opal_memory_base_component_deregister_empty,
+    empty_malloc_set_alignment,
 };
 
 
@@ -90,6 +95,20 @@ static int opal_memory_base_open(mca_base_open_flag_t flags)
     /* All done */
     return OPAL_SUCCESS;
 }
+
+#if MEMORY_HAVE_MALLOC_HOOK_SUPPORT
+void opal_memory_base_malloc_init_hook(void)
+{
+#if MEMORY_LINUX_PTMALLOC2
+    /* Of course it is abstraction violation but unfortunately there is no way
+     * to do this thing using correct approach. It is an attempt to keep
+     * all clumsy code related memory framework in single place.
+     */
+    extern void opal_memory_linux_malloc_init_hook(void);
+    opal_memory_linux_malloc_init_hook();
+#endif /* MEMORY_LINUX_PTMALLOC2 */
+}
+#endif /* MEMORY_HAVE_MALLOC_HOOK_SUPPORT */
 
 /* Use default register/close functions */
 MCA_BASE_FRAMEWORK_DECLARE(opal, memory, "memory hooks", NULL, opal_memory_base_open, NULL,
