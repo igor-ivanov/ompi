@@ -704,13 +704,13 @@ int btl_openib_register_mca_params(void)
                   REGINT_GE_ZERO));
 
 #if MEMORY_LINUX_MALLOC_ALIGN_ENABLED
-    tmp = mca_base_var_find ("opal", "memory", "linux", "memalign");
+    tmp = mca_base_var_find ("opal", "memory", "base", "memalign");
     if (0 <= tmp) {
         (void) mca_base_var_register_synonym(tmp, "opal", "btl", "openib", "memalign",
                                              MCA_BASE_VAR_SYN_FLAG_DEPRECATED);
     }
 
-    tmp = mca_base_var_find ("opal", "memory", "linux", "memalign_threshold");
+    tmp = mca_base_var_find ("opal", "memory", "base", "memalign_threshold");
     if (0 <= tmp) {
         (void) mca_base_var_register_synonym(tmp, "opal", "btl", "openib", "memalign_threshold",
                                              MCA_BASE_VAR_SYN_FLAG_DEPRECATED);

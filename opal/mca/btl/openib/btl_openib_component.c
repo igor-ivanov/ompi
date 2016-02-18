@@ -2503,9 +2503,7 @@ btl_openib_component_init(int *num_btl_modules,
        is to be set up as early as possible in this function since we
        want most of the allocated resources be aligned.
      */
-    if (opal_memory->memoryc_malloc_set_alignment) {
-        opal_memory->memoryc_malloc_set_alignment(32, mca_btl_openib_module.super.btl_eager_limit);
-    }
+    opal_memory->memoryc_malloc_set_alignment(32, mca_btl_openib_module.super.btl_eager_limit);
 
     /* Per https://svn.open-mpi.org/trac/ompi/ticket/1305, check to
        see if $sysfsdir/class/infiniband exists.  If it does not,

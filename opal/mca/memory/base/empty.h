@@ -51,6 +51,14 @@ OPAL_DECLSPEC int opal_memory_base_component_deregister_empty(void *start,
                                                               size_t len,
                                                               uint64_t cookie);
 
+/**
+ * Default (empty) implementation of the memoryc_malloc_set_alignment function
+ *
+ * See opal/mca/memory/memory.h for a description of the parameters.
+ */
+OPAL_DECLSPEC void opal_memory_base_component_malloc_set_alignment(int use_memalign,
+                                                                   size_t memalign_threshold);
+
 END_C_DECLS
 
 #endif

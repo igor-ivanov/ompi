@@ -31,11 +31,6 @@ typedef struct opal_memory_linux_component_t {
     int ummunotify_fd;
 #endif
 
-#if MEMORY_LINUX_MALLOC_ALIGN_ENABLED
-    int use_memalign;
-    size_t memalign_threshold;
-#endif
-
 #if MEMORY_LINUX_PTMALLOC2
     /* Ptmalloc2-specific data. Note that these variables are all marked as volatile.
      * This is needed because of what may be a buggy optimization in the GCC 4.9.2

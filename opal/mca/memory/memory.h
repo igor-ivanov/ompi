@@ -142,6 +142,8 @@ typedef struct opal_memory_base_component_2_0_0_t {
         specific memory region */
     opal_memory_base_component_deregister_fn_t memoryc_deregister;
 
+    /** Function change default behaivour of malloc() to return
+        aligned allocated buffer. */
     opal_memory_base_component_malloc_set_alignment_fn_t memoryc_malloc_set_alignment;
 } opal_memory_base_component_2_0_0_t;
 
